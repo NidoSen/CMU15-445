@@ -1,167 +1,65 @@
-<img src="logo/bustub-whiteborder.svg" alt="BusTub Logo" height="200">
+# CMU15-445/2022Fall 记录
 
------------------
+## 配环境踩过的坑
 
-[![Build Status](https://github.com/cmu-db/bustub/actions/workflows/cmake.yml/badge.svg)](https://github.com/cmu-db/bustub/actions/workflows/cmake.yml)
+注意：使用的Ubuntu18.04版本，且已安装好；坑的部分不是很全，只记录了些我觉得比较重要，而且自己还有印象的部分（可能通关后会试着重装一遍，到时再补充）
 
-BusTub is a relational database management system built at [Carnegie Mellon University](https://db.cs.cmu.edu) for the [Introduction to Database Systems](https://15445.courses.cs.cmu.edu) (15-445/645) course. This system was developed for educational purposes and should not be used in production environments.
+### `git` 部分
 
-BusTub supports basic SQL and comes with an interactive shell. You can get it running after finishing all the course projects.
+做2022fall版本，需要找到CMU原仓库对应的 `tag` 后才能 `git clone`，否则下载的是master分支，也就是今年CMU15-445正在用的分支，而不是2022fall版本
 
-<img src="logo/sql.png" alt="BusTub SQL" width="400">
-
-**WARNING: IF YOU ARE A STUDENT IN THE CLASS, DO NOT DIRECTLY FORK THIS REPO. DO NOT PUSH PROJECT SOLUTIONS PUBLICLY. THIS IS AN ACADEMIC INTEGRITY VIOLATION AND CAN LEAD TO GETTING YOUR DEGREE REVOKED, EVEN AFTER YOU GRADUATE.**
-
-## Cloning this Repository
-
-The following instructions are adapted from the Github documentation on [duplicating a repository](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/creating-a-repository-on-github/duplicating-a-repository). The procedure below walks you through creating a private BusTub repository that you can use for development.
-
-1. Go [here](https://github.com/new) to create a new repository under your account. Pick a name (e.g. `bustub-private`) and select **Private** for the repository visibility level.
-2. On your development machine, create a bare clone of the public BusTub repository:
-   ```
-   $ git clone --bare https://github.com/cmu-db/bustub.git bustub-public
-   ```
-3. Next, [mirror](https://git-scm.com/docs/git-push#Documentation/git-push.txt---mirror) the public BusTub repository to your own private BusTub repository. Suppose your GitHub name is `student` and your repository name is `bustub-private`. The procedure for mirroring the repository is then:
-   ```
-   $ cd bustub-public
-   
-   # If you pull / push over HTTPS
-   $ git push https://github.com/student/bustub-private.git master
-
-   # If you pull / push over SSH
-   $ git push git@github.com:student/bustub-private.git master
-   ```
-   This copies everything in the public BusTub repository to your own private repository. You can now delete your local clone of the public repository:
-   ```
-   $ cd ..
-   $ rm -rf bustub-public
-   ```
-4. Clone your private repository to your development machine:
-   ```
-   # If you pull / push over HTTPS
-   $ git clone https://github.com/student/bustub-private.git
-
-   # If you pull / push over SSH
-   $ git clone git@github.com:student/bustub-private.git
-   ```
-5. Add the public BusTub repository as a second remote. This allows you to retrieve changes from the CMU-DB repository and merge them with your solution throughout the semester:
-   ```
-   $ git remote add public https://github.com/cmu-db/bustub.git
-   ```
-   You can verify that the remote was added with the following command:
-   ```
-   $ git remote -v
-   origin	https://github.com/student/bustub-private.git (fetch)
-   origin	https://github.com/student/bustub-private.git (push)
-   public	https://github.com/cmu-db/bustub.git (fetch)
-   public	https://github.com/cmu-db/bustub.git (push)
-   ```
-6. You can now pull in changes from the public BusTub repository as needed with:
-   ```
-   $ git pull public master
-   ```
-7. **Disable GitHub Actions** from the project settings of your private repository, otherwise you may run out of GitHub Actions quota.
-   ```
-   Settings > Actions > General > Actions permissions > Disable actions.
-   ```
-
-We suggest working on your projects in separate branches. If you do not understand how Git branches work, [learn how](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging). If you fail to do this, you might lose all your work at some point in the semester, and nobody will be able to help you.
-
-## Build
-
-We recommend developing BusTub on Ubuntu 20.04, Ubuntu 22.04, or macOS (M1/M2/Intel). We do not support any other environments (i.e., do not open issues or come to office hours to debug them). We do not support WSL.
-
-### Linux / Mac (Recommended)
-
-To ensure that you have the proper packages on your machine, run the following script to automatically install them:
+2022fall的分支tag是 `v20221128-2022fall`，先将其克隆到本地：
 
 ```
-# Linux
-$ sudo build_support/packages.sh
-# macOS
-$ build_support/packages.sh
+git clone -branch v20221128-2022fall git@github.com:cmu-db/bustub.git
 ```
 
-Then run the following commands to build the system:
+之后按官方的教程走，是不能直接推送仓库到自己的远程仓库的，需要在当前仓库执行以下命令
 
 ```
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
+git config --global --add safe.directory "*"
 ```
 
-If you want to compile the system in debug mode, pass in the following flag to cmake:
-Debug mode:
+然后在自己的远程仓库新建一个空仓库（不要创建README.md文件），将仓库通过以下命令推送到自己的远程仓库（官方的命令直接使用会有错误）
 
 ```
-$ cmake -DCMAKE_BUILD_TYPE=Debug ..
-$ make -j`nproc`
-```
-This enables [AddressSanitizer](https://github.com/google/sanitizers) by default.
-
-If you want to use other sanitizers,
-
-
-```
-$ cmake -DCMAKE_BUILD_TYPE=Debug -DBUSTUB_SANITIZER=thread ..
-$ make -j`nproc`
+git push git@github.com:NidoSen/CMU15-445.git HEAD:refs/heads/master
 ```
 
-### Windows (Not Guaranteed to Work)
+后续就是按教程走了，先把本地仓库删除，然后将远程仓库 `git clone` 到本地，就可以开始后续配环境的操作了
 
-If you are using Windows 10, you can use the Windows Subsystem for Linux (WSL) to develop, build, and test Bustub. All you need is to [Install WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10). You can just choose "Ubuntu" (no specific version) in Microsoft Store. Then, enter WSL and follow the above instructions.
+### 安装部分
 
-If you are using CLion, it also [works with WSL](https://blog.jetbrains.com/clion/2018/01/clion-and-linux-toolchain-on-windows-are-now-friends).
-
-### Vagrant (Not Guaranteed to Work)
-
-First, make sure you have Vagrant and Virtualbox installed
-```
-$ sudo apt update
-$ sudo apt install vagrant virtualbox
-```
-
-From the repository directory, run this command to create and start a Vagrant box:
+2022fall的CMU15-445用的是 `clang-12`，网上找的安装教程有些不一定适合，我用的是[清华的镜像](https://mirrors4.tuna.tsinghua.edu.cn/help/llvm-apt/)，其实中间还有些换源的操作，这些操作网上教程容易找到，就不赘述了
 
 ```
-$ vagrant up
+wget https://mirrors.tuna.tsinghua.edu.cn/llvm-apt/llvm.sh
+chmod +x llvm.sh
+./llvm.sh all -m https://mirrors.tuna.tsinghua.edu.cn/llvm-apt
 ```
 
-This will start a Vagrant box running Ubuntu 20.02 in the background with all the packages needed. To access it, type
+然后记得升级下 `gcc/g++`，版本过低在 `make` 阶段会有各种恶心的错误，我升级到了11版本
+
+之后按教程执行以下语句
 
 ```
-$ vagrant ssh
+sudo bash build_support/packages.sh
 ```
 
-to open a shell within the box. You can find Bustub's code mounted at `/bustub` and run the commands mentioned above like normal.
-
-### Docker (Not Guaranteed to Work)
-
-First, make sure that you have docker installed:
-```
-$ sudo apt update
-$ sudo apt install docker
-```
-
-From the repository directory, run these commands to create a Docker image and container:
+会报错：
 
 ```
-$ docker build . -t bustub
-$ docker create -t -i --name bustub -v $(pwd):/bustub bustub bash
+'\r': command not found [duplicate]
 ```
 
-This will create a Docker image and container. To run it, type:
+原因和Windows和Linux的文件格式有关，可以按命令重新生成一个去掉 `\r` 的 `packages_new.sh` 文件，并重新执行
 
 ```
-$ docker start -a -i bustub
+cd build
+tr -d "\r" < packages.sh > packages_new.sh
+cd ..
+sudo bash build_support/packages_new.sh
 ```
 
-to open a shell within the box. You can find Bustub's code mounted at `/bustub` and run the commands mentioned above like normal.
+之后走完教程就能编译通过了
 
-## Testing
-
-```
-$ cd build
-$ make check-tests
-```
