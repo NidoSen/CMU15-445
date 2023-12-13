@@ -21,6 +21,7 @@
 
 #include "common/exception.h"
 #include "common/rwlatch.h"
+#include "common/logger.h"
 
 namespace bustub {
 
@@ -37,7 +38,10 @@ class TrieNode {
    *
    * @param key_char Key character of this trie node
    */
-  explicit TrieNode(char key_char) {}
+  explicit TrieNode(char key_char) {
+    key_char_ = key_char;
+    is_end_ = false;
+  }
 
   /**
    * TODO(P0): Add implementation
@@ -47,7 +51,10 @@ class TrieNode {
    *
    * @param other_trie_node Old trie node.
    */
-  TrieNode(TrieNode &&other_trie_node) noexcept {}
+  TrieNode(TrieNode &&other_trie_node) noexcept : children_(std::move(other_trie_node.children_)) {
+    key_char_ = other_trie_node.key_char_;
+    is_end_ = other_trie_node.is_end_;
+  }
 
   /**
    * @brief Destroy the TrieNode object.
@@ -62,7 +69,14 @@ class TrieNode {
    * @param key_char Key char of child node.
    * @return True if this trie node has a child with given key, false otherwise.
    */
-  bool HasChild(char key_char) const { return false; }
+  bool HasChild(char key_char) const {
+    if (children_.find(key_char) != children_.end()) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 
   /**
    * TODO(P0): Add implementation
@@ -72,7 +86,7 @@ class TrieNode {
    *
    * @return True if this trie node has any child node, false if it has no child node.
    */
-  bool HasChildren() const { return false; }
+  bool HasChildren() const { return !children_.empty(); }
 
   /**
    * TODO(P0): Add implementation
@@ -81,7 +95,7 @@ class TrieNode {
    *
    * @return True if is_end_ flag is true, false if is_end_ is false.
    */
-  bool IsEndNode() const { return false; }
+  bool IsEndNode() const { return is_end_; }
 
   /**
    * TODO(P0): Add implementation
@@ -90,7 +104,7 @@ class TrieNode {
    *
    * @return key_char_ of this trie node.
    */
-  char GetKeyChar() const { return 'a'; }
+  char GetKeyChar() const { return key_char_; }
 
   /**
    * TODO(P0): Add implementation
@@ -111,7 +125,15 @@ class TrieNode {
    * @param child Unique pointer created for the child node. This should be added to children_ map.
    * @return Pointer to unique_ptr of the inserted child node. If insertion fails, return nullptr.
    */
-  std::unique_ptr<TrieNode> *InsertChildNode(char key_char, std::unique_ptr<TrieNode> &&child) { return nullptr; }
+  std::unique_ptr<TrieNode> *InsertChildNode(char key_char, std::unique_ptr<TrieNode> &&child) {
+    if (children_.find(key_char) != children_.end() || key_char != (*child).GetKeyChar()) {
+      return nullptr;
+    }
+    else {
+      children_[key_char] = std::move(child);
+      return &children_[key_char];
+    }
+  }
 
   /**
    * TODO(P0): Add implementation
@@ -123,7 +145,14 @@ class TrieNode {
    * @return Pointer to unique_ptr of the child node, nullptr if child
    *         node does not exist.
    */
-  std::unique_ptr<TrieNode> *GetChildNode(char key_char) { return nullptr; }
+  std::unique_ptr<TrieNode> *GetChildNode(char key_char) {
+    if (children_.find(key_char) != children_.end()) {
+      return &children_[key_char];
+    }
+    else {
+      return nullptr;
+    }
+  }
 
   /**
    * TODO(P0): Add implementation
@@ -133,7 +162,11 @@ class TrieNode {
    *
    * @param key_char Key char of child node to be removed
    */
-  void RemoveChildNode(char key_char) {}
+  void RemoveChildNode(char key_char) {
+    if (children_.find(key_char) != children_.end()) {
+      children_.erase(key_char);
+    }
+  }
 
   /**
    * TODO(P0): Add implementation
@@ -142,7 +175,9 @@ class TrieNode {
    *
    * @param is_end Whether this trie node is ending char of a key string
    */
-  void SetEndNode(bool is_end) {}
+  void SetEndNode(bool is_end) {
+    is_end_ = is_end;
+  }
 
  protected:
   /** Key character of this trie node */
@@ -183,7 +218,10 @@ class TrieNodeWithValue : public TrieNode {
    * @param trieNode TrieNode whose data is to be moved to TrieNodeWithValue
    * @param value
    */
-  TrieNodeWithValue(TrieNode &&trieNode, T value) {}
+  TrieNodeWithValue(TrieNode &&trieNode, T value) : TrieNode(std::forward<TrieNode>(trieNode)) {
+    value_ = value;
+    is_end_ = true;
+  }
 
   /**
    * TODO(P0): Add implementation
@@ -198,7 +236,10 @@ class TrieNodeWithValue : public TrieNode {
    * @param key_char Key char of this node
    * @param value Value of this node
    */
-  TrieNodeWithValue(char key_char, T value) {}
+  TrieNodeWithValue(char key_char, T value) : TrieNode(key_char) {
+    value_ = value;
+    is_end_ = true;
+  }
 
   /**
    * @brief Destroy the Trie Node With Value object
@@ -231,7 +272,9 @@ class Trie {
    * @brief Construct a new Trie object. Initialize the root node with '\0'
    * character.
    */
-  Trie() = default;
+  Trie() {
+    root_ = std::unique_ptr<TrieNode>(new TrieNode('\0'));
+  }
 
   /**
    * TODO(P0): Add implementation
@@ -261,7 +304,46 @@ class Trie {
    */
   template <typename T>
   bool Insert(const std::string &key, T value) {
-    return false;
+
+    latch_.WLock();
+
+    if (key.length() == 0) {
+      latch_.WUnlock();
+      return false;
+    }    
+
+    std::unique_ptr<TrieNode> *pre = &root_;
+    unsigned int index;
+    for (index = 0; index < key.length() - 1; index++) {
+      if (!(*pre)->HasChild(key[index])) {
+        break;
+      }
+      pre = (*pre)->GetChildNode(key[index]);
+    }
+    
+    for (; index < key.length() - 1; index++) {
+      (*pre)->InsertChildNode(key[index], std::make_unique<TrieNode>(key[index]));
+      pre = (*pre)->GetChildNode(key[index]);
+    }
+    
+    std::unique_ptr<TrieNode> *preChild = (*pre)->GetChildNode(key[index]);
+    if (preChild && (*preChild)->IsEndNode()) {
+      latch_.WUnlock();
+      return false;
+    }
+    else if (preChild) {
+      std::unique_ptr<TrieNode> newChild(new TrieNode(std::move(**preChild)));
+      std::unique_ptr<TrieNodeWithValue<T>> newChildWithValue(new TrieNodeWithValue(std::move(*newChild), value));
+      
+      (*pre)->RemoveChildNode(key[index]);
+      (*pre)->InsertChildNode(key[index], std::move(newChildWithValue));
+    }
+    else {
+      (*pre)->InsertChildNode(key[index], std::make_unique<TrieNodeWithValue<T>>(key[index], value));
+    }
+    
+    latch_.WUnlock();
+    return true;
   }
 
   /**
@@ -281,7 +363,44 @@ class Trie {
    * @param key Key used to traverse the trie and find the correct node
    * @return True if the key exists and is removed, false otherwise
    */
-  bool Remove(const std::string &key) { return false; }
+  bool Remove(const std::string &key) {
+
+    latch_.WLock();
+
+    if (key.length() == 0) {
+      return false;
+    }
+
+    std::unique_ptr<TrieNode> *pre = &root_;
+    unsigned int index;
+    for (index = 0; index < key.length() - 1; index++) {
+      if (!(*pre)->HasChild(key[index])) {
+        latch_.WUnlock();
+        return false;
+      }
+      pre = (*pre)->GetChildNode(key[index]);
+    }
+
+    if (!(*pre)->HasChild(key[index])) {
+      latch_.WUnlock();
+      return false;
+    }
+    std::unique_ptr<TrieNode> *preChild = (*pre)->GetChildNode(key[index]);
+
+    if (!(*preChild)->IsEndNode()) {
+      latch_.WUnlock();
+      return false;
+    }
+
+    std::unique_ptr<TrieNode> newChild(new TrieNode(std::move(**preChild)));
+    newChild->SetEndNode(false);
+
+    (*pre)->RemoveChildNode(key[index]);
+    (*pre)->InsertChildNode(key[index], std::move(newChild));
+
+    latch_.WUnlock();
+    return true;
+  }
 
   /**
    * TODO(P0): Add implementation
@@ -303,7 +422,40 @@ class Trie {
    */
   template <typename T>
   T GetValue(const std::string &key, bool *success) {
-    *success = false;
+    latch_.RLock();
+
+    *success = true;
+
+    if (key.length() == 0) {
+      *success = false;
+    }
+    
+    std::unique_ptr<TrieNode> *pre = &root_;
+    for (unsigned int i = 0; i < key.length(); i++) {
+      if (!(*pre)->HasChild(key[i])) {
+        *success = false;
+        break;
+      }
+      pre = (*pre)->GetChildNode(key[i]);
+    }
+
+    if (*success) {
+      if (!(*pre)->IsEndNode()) {
+        *success = false;
+      }
+      else {
+        auto Value = (dynamic_cast<TrieNodeWithValue<T>*>(pre->get()))->GetValue();
+        if (typeid(T) != typeid(Value)) {
+          *success = false;
+        }
+        else {
+          latch_.RUnlock();
+          return Value;
+        }
+      }
+    }
+
+    latch_.RUnlock();
     return {};
   }
 };
