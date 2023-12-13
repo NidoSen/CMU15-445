@@ -413,25 +413,30 @@ class Trie {
       *success = false;
     }
 
-    std::unique_ptr<TrieNode> *pre = &root_;
+    std::unique_ptr<TrieNode> *pre_node = &root_;
     for (char c : key) {
-      if (!(*pre)->HasChild(c)) {
+      if (!(*pre_node)->HasChild(c)) {
         *success = false;
         break;
       }
-      pre = (*pre)->GetChildNode(c);
+      pre_node = (*pre_node)->GetChildNode(c);
     }
 
     if (*success) {
-      if (!(*pre)->IsEndNode()) {
+      if (!(*pre_node)->IsEndNode()) {
         *success = false;
       } else {
-        auto value = (dynamic_cast<TrieNodeWithValue<T> *>(pre->get()))->GetValue();
-        if (typeid(T) != typeid(value)) {
+        auto with_value_pre_node = dynamic_cast<TrieNodeWithValue<T> *>(pre_node->get());
+        if (!with_value_pre_node) {
           *success = false;
         } else {
-          latch_.RUnlock();
-          return value;
+          auto value = with_value_pre_node->GetValue();
+          if (typeid(T) != typeid(value)) {
+            *success = false;
+          } else {
+            latch_.RUnlock();
+            return value;
+          }
         }
       }
     }
