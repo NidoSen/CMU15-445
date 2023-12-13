@@ -375,11 +375,11 @@ class Trie {
       return false;
     }
 
-    std::unique_ptr<TrieNode> newChild(new TrieNode(std::move(**child_node)));
-    newChild->SetEndNode(false);
+    std::unique_ptr<TrieNode> new_child(new TrieNode(std::move(**child_node)));
+    new_child->SetEndNode(false);
 
     (*pre_node)->RemoveChildNode(key[index]);
-    (*pre_node)->InsertChildNode(key[index], std::move(newChild));
+    (*pre_node)->InsertChildNode(key[index], std::move(new_child));
 
     latch_.WUnlock();
     return true;
