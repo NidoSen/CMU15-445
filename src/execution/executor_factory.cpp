@@ -42,8 +42,8 @@
 
 namespace bustub {
 
-auto ExecutorFactory::CreateExecutor(ExecutorContext *exec_ctx, const AbstractPlanNodeRef &plan)
-    -> std::unique_ptr<AbstractExecutor> {
+auto ExecutorFactory::CreateExecutor(ExecutorContext *exec_ctx,
+                                     const AbstractPlanNodeRef &plan) -> std::unique_ptr<AbstractExecutor> {
   switch (plan->GetType()) {
     // Create a new sequential scan executor
     case PlanType::SeqScan: {

@@ -81,8 +81,8 @@ class TablePage : public Page {
    * @param log_manager the log manager
    * @return true if the insert is successful (i.e. there is enough space)
    */
-  auto InsertTuple(const Tuple &tuple, RID *rid, Transaction *txn, LockManager *lock_manager, LogManager *log_manager)
-      -> bool;
+  auto InsertTuple(const Tuple &tuple, RID *rid, Transaction *txn, LockManager *lock_manager,
+                   LogManager *log_manager) -> bool;
 
   /**
    * Mark a tuple as deleted. This does not actually delete the tuple.

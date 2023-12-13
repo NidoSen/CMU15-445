@@ -115,14 +115,14 @@ class Planner {
   auto PlanExpression(const BoundExpression &expr, const std::vector<AbstractPlanNodeRef> &children)
       -> std::tuple<std::string, AbstractExpressionRef>;
 
-  auto PlanBinaryOp(const BoundBinaryOp &expr, const std::vector<AbstractPlanNodeRef> &children)
-      -> AbstractExpressionRef;
+  auto PlanBinaryOp(const BoundBinaryOp &expr,
+                    const std::vector<AbstractPlanNodeRef> &children) -> AbstractExpressionRef;
 
   auto PlanColumnRef(const BoundColumnRef &expr, const std::vector<AbstractPlanNodeRef> &children)
       -> std::tuple<std::string, std::shared_ptr<ColumnValueExpression>>;
 
-  auto PlanConstant(const BoundConstant &expr, const std::vector<AbstractPlanNodeRef> &children)
-      -> AbstractExpressionRef;
+  auto PlanConstant(const BoundConstant &expr,
+                    const std::vector<AbstractPlanNodeRef> &children) -> AbstractExpressionRef;
 
   auto PlanSelectAgg(const SelectStatement &statement, AbstractPlanNodeRef child) -> AbstractPlanNodeRef;
 
