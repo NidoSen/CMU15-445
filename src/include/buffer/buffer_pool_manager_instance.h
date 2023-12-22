@@ -24,6 +24,8 @@
 #include "storage/disk/disk_manager.h"
 #include "storage/page/page.h"
 
+#include "common/logger.h"
+
 namespace bustub {
 
 /**

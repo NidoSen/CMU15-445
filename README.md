@@ -85,7 +85,7 @@ sudo bash build_support/packages_new.sh
 
 - 提交方式，在最后的 `SUBMISSION` 提到了，作业只能通过 `zip` 文件的方式提交，不能用 `github` 提交，且 `zip` 最好使用提供的命令，因为提交的文件需要包括路径
 
-## Project 0 本身
+### Project 0 本身
 
 项目要求实现的是一个 `Trie` 树，不熟悉的可以先看看 [208. 实现 Trie (前缀树)](https://leetcode.cn/problems/implement-trie-prefix-tree/)
 
@@ -108,3 +108,46 @@ sudo bash build_support/packages_new.sh
 别的想起来继续补充，这里放一张线上测试满分的图
 
 <img src="mySources\scores\Project 0 Score.jpg" style="zoom: 67%;" />
+
+---
+
+## Project 1 - Buffer Pool
+
+进入正题后，虽然Project1是整个项目的开始和最简单的部分，但也能明显感觉到，这个难度和Project0就不是一个级别的，断断续续做了几天，几乎每个Task都能让我头脑风暴（后面还有更难的3个project，希望脑细胞还够用）
+
+### Task 1 - Extendible Hash Table
+
+Task1的任务是实现一个可扩展散列表，个人认为这是整个Project1最难的部分，原因在于可扩展散列表的设计思路和我们平常接触的散列表是差别很大的，如果没有看过 **`Lecture #07: Hash Tables`**，是很难自己想对的（比较奇怪的**这节课是 `Project 1` 布置后才上的**，我以为 `Project 1` 布置的时候，需要的前置知识都讲完了，就没看后面的课直接做，那叫一个酸爽啊），这里就记录下曾经卡住我很长时间的几个点：
+
+- `depth_` 和 `golbal_depth_` 的含义一定要理解正确，自己一开始以为 `depth_` 是单个容器 `dir_[i]` 里存储的键值对个数，而  `golbal_depth_` 是最大的 `depth_` （被自己蠢到背过头去），它们实际上是决定使用键的哈希值的倒数几位来确定装入哪个容器
+- `dir_` 是一个指针数组，而且 `dir_[i]` 和 `dir_[j]` 可能指向同一个容器（我一开始以为必须是两个），如何设计和  `depth_` 与 `golbal_depth_`  密切相关
+- 题目给了 `RedistributeBucket` 函数让我们自己实现，这个函数可能会给人误解，我当时看到这个函数，以为每次容器装满时，调整当前容器 `dir_[i]` 就可以了，实际上是需要全局调整 `dir_` 的，因此自己最后并没有实现这个函数，自己在 `Insert` 函数里完成了全局调整
+
+### Task 2 - LRU-K Replacement Policy
+
+这个部分要求实现LRU算法（力扣相关题：[146. LRU 缓存](https://leetcode.cn/problems/lru-cache/)）的改进，即LRU-K算法，LRU-K算法的原理还是比较简单易懂的，但如果没有了解实现的思路，光自己想是很难实现LRU-K的代码的，这里推荐一位大佬的文章：[缓存替换策略：LRU-K算法详解及其C++实现 CMU15-445 Project#1](https://blog.csdn.net/AntiO2/article/details/128439155)，TA甚至直接把论文原文找出来了[The LRU-K page replacement algorithm for database disk buffering (acm.org)](https://dl.acm.org/doi/epdf/10.1145/170036.170081)，真的感谢
+
+代码实现前需要重点理解 `K-distance` 和 `HIST(p)` 的含义（其实还有`LAST(p)`，这个涉及到关联访问，可能优化阶段我会加上，但仅仅完成Task2还不需要用到它），这部分感觉上面这位大佬写得听清楚的，如果英语阅读困难（说的就是我），可以参考；同时还需要理解论文里给出来的伪代码（因为把关联访问和`LAST(p)`的部分删了，所以实际上我实现的伪代码是经过简化的）
+
+尽管伪代码和变量解读分别参考论文和大佬的文章，但伪代码到可运行代码，自己还是一行一行敲出来的（不过目前性能还很差，优化阶段打算引入堆）
+
+### Task 3 - Buffer Pool Manager Instance
+
+Task3应该是整个Project1在思路上最简单的部分了，因为头文件的注释部分给每个函数都讲清楚了实现思路，不同于前面两个Task，Task3的实现思路是能根据注释直接把代码一行一行写出来，但只是这样可能做完对整个 Buffer Pool 的认知还不够，可能还得看下其他大佬的文章
+
+这里只记录下我踩过的两个大坑，后两个坑的解决让我从67走到了100
+
+- `Page.h` 头文件要看下，另外 `BufferPoolManagerInstance` 类作为友元类，是可以直接访问 `Page` 类的私有变量的，因此  `Page` 类不需要提供修改它私有变量的接口
+- 每次 `NewPgImp` 和 `FetchPgImp` 操作都会导致内存块（页框，`frame`）对应的 `Page` 的 `pin_count_` 增加，其中  `FetchPgImp`  操作并不是只有在替换内存块的时候才增加
+- `UnpinPgImp `操作，只有在当前 `Page` 的`is_dirty_` 为 `false` 的时候才能直接进行更改
+
+### 待优化的部分
+
+目前的性能是很差的，差到我不敢把 `Leaderboard` 上的排名放出来，但目前的打算还是先尽快通关CMU15-445，所以优化得等完成后了，先留个坑。现在能想到的比较明显的可优化部分有两个（当然实际上肯定不止），等回来变优化边记录
+
+- LRU-K部分，每次找 `K-distance` 最大的驱逐块是采用遍历的方式，需要引入堆来优化，
+- 全程使用大锁 `std::scoped_lock<std::mutex> lock(latch_)` 来解决多线程问题，可以考虑使用更细致的锁
+
+别的想起来继续补充，这里放一张线上测试满分的图（ `Leaderboard` 排名就不放了，太差了），并期待接下来的 Project 2，就网上的信息看，是难度拉满的B+树，希望自己脑细胞还够用吧
+
+<img src="mySources\scores\Project 1 Score.jpg" style="zoom:67%;" />
