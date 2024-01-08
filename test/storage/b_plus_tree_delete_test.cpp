@@ -18,9 +18,13 @@
 #include "storage/index/b_plus_tree.h"
 #include "test_util.h"  // NOLINT
 
+#include <numeric>
+#include <random>
+#include <string>
+
 namespace bustub {
 
-TEST(BPlusTreeTests, DISABLED_DeleteTest1) {
+TEST(BPlusTreeTests, DeleteTest1) {
   // create KeyComparator and index schema
   auto key_schema = ParseCreateStatement("a bigint");
   GenericComparator<8> comparator(key_schema.get());
@@ -39,6 +43,7 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest1) {
   auto header_page = bpm->NewPage(&page_id);
   (void)header_page;
 
+  // std::vector<int64_t> keys = {1, 2, 3, 4, 5};
   std::vector<int64_t> keys = {1, 2, 3, 4, 5};
   for (auto key : keys) {
     int64_t value = key & 0xFFFFFFFF;
@@ -58,6 +63,7 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest1) {
     EXPECT_EQ(rids[0].GetSlotNum(), value);
   }
 
+  // std::vector<int64_t> remove_keys = {1, 5};
   std::vector<int64_t> remove_keys = {1, 5};
   for (auto key : remove_keys) {
     index_key.SetFromInteger(key);
@@ -82,6 +88,7 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest1) {
     }
   }
 
+  // EXPECT_EQ(size, 3);
   EXPECT_EQ(size, 3);
 
   bpm->UnpinPage(HEADER_PAGE_ID, true);
@@ -163,4 +170,5 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest2) {
   remove("test.db");
   remove("test.log");
 }
+
 }  // namespace bustub

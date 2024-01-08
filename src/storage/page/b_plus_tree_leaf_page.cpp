@@ -73,7 +73,7 @@ auto B_PLUS_TREE_LEAF_PAGE_TYPE::FindKeyIndex(const KeyType &key, const KeyCompa
   }
 
   *index = left_index;
-  return comparator(array_[left_index].first, key) == 0;
+  return left_index < GetSize() && comparator(array_[left_index].first, key) == 0;
 }
 
 INDEX_TEMPLATE_ARGUMENTS
@@ -86,10 +86,13 @@ void B_PLUS_TREE_LEAF_PAGE_TYPE::SetKeyValueAt(const KeyType &key, const ValueTy
   IncreaseSize(1);
 }
 
-// INDEX_TEMPLATE_ARGUMENTS
-// auto B_PLUS_TREE_LEAF_PAGE_TYPE::KeyValueAt(int index) const -> MappingType {
-//   return array_[index];
-// }
+INDEX_TEMPLATE_ARGUMENTS
+void B_PLUS_TREE_LEAF_PAGE_TYPE::RemoveKeyValueAt(const KeyType &key, int index) {
+  for (int i = index; i < GetSize() - 1; i++) {
+    array_[i] = array_[i + 1];
+  }
+  IncreaseSize(-1);
+}
 
 template class BPlusTreeLeafPage<GenericKey<4>, RID, GenericComparator<4>>;
 template class BPlusTreeLeafPage<GenericKey<8>, RID, GenericComparator<8>>;

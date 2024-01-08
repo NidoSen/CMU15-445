@@ -54,7 +54,7 @@ class BPlusTreeLeafPage : public BPlusTreePage {
   auto ValueAt(int index) const -> ValueType;
   auto FindKeyIndex(const KeyType &key, const KeyComparator &comparator, int *index) const -> bool;
   void SetKeyValueAt(const KeyType &key, const ValueType &value, int index);
-  // auto KeyValueAt(int index) const -> MappingType;
+  void RemoveKeyValueAt(const KeyType &key, int index);
 
  private:
   page_id_t next_page_id_;

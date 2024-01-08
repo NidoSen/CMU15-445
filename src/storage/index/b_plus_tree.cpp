@@ -216,7 +216,36 @@ auto BPLUSTREE_TYPE::Insert(const KeyType &key, const ValueType &value, Transact
  * necessary.
  */
 INDEX_TEMPLATE_ARGUMENTS
-void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {}
+void BPLUSTREE_TYPE::Remove(const KeyType &key, Transaction *transaction) {
+  if (IsEmpty()) {
+    return;
+  }
+
+  auto cur_page = reinterpret_cast<BPlusTreePage *>(buffer_pool_manager_->FetchPage(root_page_id_)->GetData());
+  int index;
+  while (!cur_page->IsLeafPage()) {
+    auto cur_internal_page = reinterpret_cast<InternalPage *>(cur_page);
+    cur_internal_page->FindKeyIndex(key, comparator_, &index);
+    cur_page = reinterpret_cast<BPlusTreePage *>(
+        buffer_pool_manager_->FetchPage(cur_internal_page->ValueAt(index))->GetData());
+    buffer_pool_manager_->UnpinPage(cur_internal_page->GetPageId(), false);
+  }
+
+  auto cur_leaf_page = reinterpret_cast<LeafPage *>(cur_page);
+  if (!cur_leaf_page->FindKeyIndex(key, comparator_, &index)) {  // 如果叶子节点不存在key，无需删除，直接返回
+    buffer_pool_manager_->UnpinPage(cur_leaf_page->GetPageId(), false);
+    return;
+  }
+
+  // LOG_INFO("$ %d $ %d $ %d $", cur_leaf_page->GetPageId(), index, cur_leaf_page->GetSize());
+
+  cur_leaf_page->RemoveKeyValueAt(key, index);
+  // LOG_INFO("$ %d $ %d $ %d $", cur_leaf_page->GetPageId(), index, cur_leaf_page->GetSize());
+  // 删除后叶子结点的键值对个数大于等于最小允许结点数，可以结束了
+  if (cur_leaf_page->IsRootPage() || cur_leaf_page->GetSize() >= leaf_max_size_ / 2) {
+    buffer_pool_manager_->UnpinPage(cur_leaf_page->GetPageId(), true);
+  }
+}
 
 /*****************************************************************************
  * INDEX ITERATOR
