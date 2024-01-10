@@ -37,10 +37,7 @@ void B_PLUS_TREE_INTERNAL_PAGE_TYPE::Init(page_id_t page_id, page_id_t parent_id
  * array offset)
  */
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::KeyAt(int index) const -> KeyType {
-  // replace with your own code
-  return array_[index].first;
-}
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::KeyAt(int index) const -> KeyType { return array_[index].first; }
 
 INDEX_TEMPLATE_ARGUMENTS
 void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetKeyAt(int index, const KeyType &key) { array_[index].first = key; }
@@ -53,7 +50,10 @@ INDEX_TEMPLATE_ARGUMENTS
 auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::ValueAt(int index) const -> ValueType { return array_[index].second; }
 
 INDEX_TEMPLATE_ARGUMENTS
-auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::FindKeyIndex(const KeyType &key, const KeyComparator &comparator, int *index) const
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetValueAt(int index, const ValueType &value) { array_[index].second = value; }
+
+INDEX_TEMPLATE_ARGUMENTS
+auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::FindKeyIndex(int *index, const KeyType &key, const KeyComparator &comparator) const
     -> bool {
   int left_index = 0;
   int right_index = GetSize() - 1;
@@ -71,16 +71,21 @@ auto B_PLUS_TREE_INTERNAL_PAGE_TYPE::FindKeyIndex(const KeyType &key, const KeyC
 }
 
 INDEX_TEMPLATE_ARGUMENTS
-void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetMinValue(const ValueType &value) { array_[0].second = value; }
-
-INDEX_TEMPLATE_ARGUMENTS
-void B_PLUS_TREE_INTERNAL_PAGE_TYPE::SetKeyValueAt(const KeyType &key, const ValueType &value, int index) {
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::InsertKeyValueAt(int index, const KeyType &key, const ValueType &value) {
   for (int i = GetSize(); i > index; i--) {
     array_[i] = array_[i - 1];
   }
   array_[index].first = key;
   array_[index].second = value;
   IncreaseSize(1);
+}
+
+INDEX_TEMPLATE_ARGUMENTS
+void B_PLUS_TREE_INTERNAL_PAGE_TYPE::RemoveKeyValueAt(int index) {
+  for (int i = index; i < GetSize() - 1; i++) {
+    array_[i] = array_[i + 1];
+  }
+  IncreaseSize(-1);
 }
 
 // valuetype for internalNode should be page id_t

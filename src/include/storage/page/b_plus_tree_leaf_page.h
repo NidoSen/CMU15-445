@@ -51,10 +51,12 @@ class BPlusTreeLeafPage : public BPlusTreePage {
   auto KeyAt(int index) const -> KeyType;
 
   // my methods
+  void SetKeyAt(int index, const KeyType &key);
   auto ValueAt(int index) const -> ValueType;
-  auto FindKeyIndex(const KeyType &key, const KeyComparator &comparator, int *index) const -> bool;
-  void SetKeyValueAt(const KeyType &key, const ValueType &value, int index);
-  void RemoveKeyValueAt(const KeyType &key, int index);
+  void SetValueAt(int index, const ValueType &value);
+  auto FindKeyIndex(int *index, const KeyType &key, const KeyComparator &comparator) const -> bool;
+  void InsertKeyValueAt(int index, const KeyType &key, const ValueType &value);
+  void RemoveKeyValueAt(int index);
 
  private:
   page_id_t next_page_id_;
