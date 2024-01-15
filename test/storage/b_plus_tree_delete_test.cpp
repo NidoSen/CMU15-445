@@ -243,7 +243,7 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest2) {
 //   remove("test.log");
 // }
 
-// TEST(BPlusTreeTests, DISABLED_ScaleTest) {
+// TEST(BPlusTreeTests, ScaleTest) {
 //   // create KeyComparator and index schema
 //   auto key_schema = ParseCreateStatement("a bigint");
 //   GenericComparator<8> comparator(key_schema.get());
@@ -262,7 +262,7 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest2) {
 //   auto header_page = bpm->NewPage(&page_id);
 //   (void)header_page;
 
-//   int64_t scale = 100000;
+//   int64_t scale = 400;
 //   std::vector<int64_t> keys;
 //   for (int64_t key = 1; key < scale; key++) {
 //     keys.push_back(key);
@@ -282,7 +282,7 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest2) {
 //   for (auto iterator = tree.Begin(); iterator != tree.End(); ++iterator) {
 //     new_size = new_size + 1;
 //   }
-//   EXPECT_EQ(new_size, 99999);
+//   EXPECT_EQ(new_size, 399);
 
 //   std::vector<RID> rids;
 //   int64_t cnt = 0;
@@ -307,7 +307,7 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest2) {
 //   remove("test.log");
 // }
 
-// TEST(GradeScopeBPlusTreeTests, ScaleTest) {
+// TEST(GradeScopeBPlusTreeTests, DISABLED_ScaleTest) {
 //   auto key_schema = ParseCreateStatement("a bigint");
 //   GenericComparator<8> comparator(key_schema.get());
 
@@ -324,7 +324,7 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest2) {
 //   auto header_page = bpm->NewPage(&page_id);
 //   (void)header_page;
 
-//   int64_t scale = 100000;
+//   int64_t scale = 10000;
 //   std::vector<int64_t> keys;
 //   for (int64_t key = 1; key < scale; key++) {
 //     keys.push_back(key);
@@ -365,7 +365,7 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest2) {
 //   }
 //   EXPECT_EQ(current_key, keys.size() + 1);
 
-//   int64_t remove_scale = 99000;
+//   int64_t remove_scale = 9900;
 //   std::vector<int64_t> remove_keys;
 //   for (int64_t key = 1; key < remove_scale; key++) {
 //     remove_keys.push_back(key);
@@ -388,7 +388,7 @@ TEST(BPlusTreeTests, DISABLED_DeleteTest2) {
 //   for (auto iterator = tree.Begin(index_key); iterator != tree.End(); ++iterator) {
 //     size = size + 1;
 //   }
-//   EXPECT_EQ(size, 1000);
+//   EXPECT_EQ(size, 100);
 
 //   // int64_t new_size = 0;
 //   // index_key.SetFromInteger(start_key);
