@@ -151,3 +151,27 @@ Task3应该是整个Project1在思路上最简单的部分了，因为头文件�
 别的想起来继续补充，这里放一张线上测试满分的图（ `Leaderboard` 排名就不放了，太差了），并期待接下来的 Project 2，就网上的信息看，是难度拉满的B+树，希望自己脑细胞还够用吧
 
 <img src="mySources\scores\Project 1 Score.jpg" style="zoom:67%;" />
+
+## Project 2 - B+Tree
+
+后续补充（断断续续做了有八九天，就难度上来说配得上“噩梦”两字了）
+
+### Task 1 - B+Tree Pages
+
+### Task 2 - B+Tree Data Structure
+
+### Task 3 - Index Iterator
+
+### Task 4 - Concurrent Index
+
+### 待优化的部分
+
+乐观锁和悲观锁（后续补充）
+
+线上测试满分结果及排名
+
+<img src="mySources\scores\Project 2 Checkpoint 1 Score.jpg" style="zoom:67%;" />
+
+<img src="mySources\scores\Project 2 Checkpoint 2 Score.jpg" style="zoom:67%;" />
+
+![](mySources\scores\Project 2  Rank 1.jpg)
