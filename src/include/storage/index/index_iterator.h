@@ -46,6 +46,12 @@ class IndexIterator {
 
   auto GetIndex() const -> int { return index_; }
 
+  // p3 add
+  auto operator=(const IndexIterator &itr) -> void {
+    page_id_ = itr.GetPageId();
+    index_ = itr.GetIndex();
+  }
+
  private:
   // add your own private member variables here
   BufferPoolManager *buffer_pool_manager_;

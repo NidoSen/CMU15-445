@@ -20,6 +20,8 @@
 #include "execution/plans/nested_loop_join_plan.h"
 #include "storage/table/tuple.h"
 
+#include "type/value_factory.h"
+
 namespace bustub {
 
 /**
@@ -55,6 +57,16 @@ class NestedLoopJoinExecutor : public AbstractExecutor {
  private:
   /** The NestedLoopJoin plan node to be executed. */
   const NestedLoopJoinPlanNode *plan_;
+  // my variable
+  std::unique_ptr<AbstractExecutor> left_executor_;
+  std::unique_ptr<AbstractExecutor> right_executor_;
+  Tuple left_tuple_;
+  RID left_rid_;
+  bool left_status_;
+  bool left_find_;
+  Tuple right_tuple_;
+  RID right_rid_;
+  bool right_status_;
 };
 
 }  // namespace bustub

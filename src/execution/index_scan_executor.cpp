@@ -20,7 +20,7 @@ IndexScanExecutor::IndexScanExecutor(ExecutorContext *exec_ctx, const IndexScanP
       tree_(dynamic_cast<BPlusTreeIndexForOneIntegerColumn *>(index_info_->index_.get())),
       index_iter_(tree_->GetBeginIterator()) {}
 
-void IndexScanExecutor::Init() {}
+void IndexScanExecutor::Init() { index_iter_ = tree_->GetBeginIterator(); }
 
 auto IndexScanExecutor::Next(Tuple *tuple, RID *rid) -> bool {
   if (index_iter_ == tree_->GetEndIterator()) {
