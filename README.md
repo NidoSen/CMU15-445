@@ -148,9 +148,13 @@ Task3应该是整个Project1在思路上最简单的部分了，因为头文件�
 - LRU-K部分，每次找 `K-distance` 最大的驱逐块是采用遍历的方式，需要引入堆来优化，
 - 全程使用大锁 `std::scoped_lock<std::mutex> lock(latch_)` 来解决多线程问题，可以考虑使用更细致的锁
 
-别的想起来继续补充，这里放一张线上测试满分的图（ `Leaderboard` 排名就不放了，太差了），并期待接下来的 Project 2，就网上的信息看，是难度拉满的B+树，希望自己脑细胞还够用吧
+别的想起来继续补充，这里放一张线上测试满分的图和 `Leaderboard` 排名，目前排名成绩很差，后面好好改进吧，并期待接下来的 Project 2，就网上的信息看，是难度拉满的B+树，希望自己脑细胞还够用吧
 
 <img src="mySources\scores\Project 1 Score.jpg" style="zoom:67%;" />
+
+<img src="mySources\scores\Project 1 Rank 1.jpg" style="zoom:80%;" />
+
+---
 
 ## Project 2 - B+Tree
 
@@ -168,10 +172,38 @@ Task3应该是整个Project1在思路上最简单的部分了，因为头文件�
 
 乐观锁和悲观锁（后续补充）
 
-线上测试满分结果及排名
+线上测试满分结果及 `Leaderboard` 排名（能比Project 1进步这么多也挺离谱的）
 
 <img src="mySources\scores\Project 2 Checkpoint 1 Score.jpg" style="zoom:67%;" />
 
 <img src="mySources\scores\Project 2 Checkpoint 2 Score.jpg" style="zoom:67%;" />
 
-![](mySources\scores\Project 2  Rank 1.jpg)
+<img src="mySources\scores\Project 2 Rank 1.jpg" style="zoom:80%;" />
+
+---
+
+## Project 3 - Query Execution
+
+后续补充（难度比Project 2低很多，但读源码的过程能感觉到能深挖很多东西，准备等过段时间没那么忙的时候好好做下 Leaderboard Task，并优化一些比较明显的可以改进的地方，先留个坑）
+
+### Task  1 - Access Method Executors
+
+###Task 2 - Aggregation & Join Executors
+
+### Task 3 - Sort + Limit Executors and Top-N Optimization
+
+### Leaderboard Task（待完成）
+
+### 待优化的部分
+
+还没做的 Leaderboard Task先不管，还有：
+
+使用 simple nested loop join algorithm 的 NestedLoopJoin算子，可以优化成使用更快的 hash join algorithm 的 HashJoin算子（涉及优化器，且Leaderboard Task的第一个任务也和这个有关）
+
+Top-N算子目前是全部排序然后选前n个，但这么做速度较慢，可以引入堆来改进
+
+线上测试满分结果和 `Leaderboard` 现状
+
+<img src="mySources\scores\Project 3 Score.jpg" style="zoom: 67%;" />
+
+<img src="mySources\scores\Project 3 Rank 1.jpg" style="zoom:80%;" />
